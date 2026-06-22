@@ -551,15 +551,40 @@ export default function Diloti() {
               const selSum = sel.reduce((a,tc)=>a+(tc.isDecl?tc.decl.value:cardVal(tc.rank)||0),0);
               const suggestions = new Set();
               if(cv && !isFace(G.selectedCard?.rank)) {
+                const getValue = tc => tc.isDecl ? tc.decl.value : cardVal(tc.rank);
+                // Plain: all selected + played card sum to dv
                 const plain = cv + selSum;
                 if(plain>=1&&plain<=10) suggestions.add(plain);
-                const selDecl = sel.find(tc=>tc.isDecl);
+                // Raise: one selected decl owned by AI, new value = decl.value + cv
+                const selDecl = sel.find(tc=>tc.isDecl&&tc.decl?.owner==="ai");
                 if(selDecl) { const raised=selDecl.decl.value+cv; if(raised<=10) suggestions.add(raised); }
+                // Group: played card (+ some table cards) = dv, remaining table cards partition into dv
+                // Only suggest dv if it's actually achievable as a group (at least 2 components)
                 if(sel.length>0 && cv>=1 && cv<=10) {
-                  // group: check if selSum is a multiple of cv (all components equal cv)
-                  if(selSum>0 && selSum%cv===0) suggestions.add(cv);
-                  // group: played card alone = cv, table cards sum = cv
-                  if(selSum===cv) suggestions.add(cv);
+                  const n=sel.length;
+                  for(let dv=1;dv<=10;dv++) {
+                    if(suggestions.has(dv)) continue; // already added as plain
+                    // Try all subsets of sel to combine with played card
+                    for(let mask=0;mask<(1<<n);mask++) {
+                      const wp=sel.filter((_,i)=>(mask>>i)&1);
+                      const rest=sel.filter((_,i)=>!((mask>>i)&1));
+                      const pSum=wp.reduce((a,tc)=>a+getValue(tc),0)+cv;
+                      if(pSum===dv && rest.length>0) {
+                        // Check rest partitions into dv-groups
+                        function canPart(items,target){
+                          if(items.length===0)return true;
+                          const m=items.length;
+                          for(let m2=1;m2<(1<<m);m2++){
+                            const sub=items.filter((_,i)=>(m2>>i)&1);
+                            const rem=items.filter((_,i)=>!((m2>>i)&1));
+                            if(sub.reduce((a,tc)=>a+getValue(tc),0)===target&&canPart(rem,target))return true;
+                          }
+                          return false;
+                        }
+                        if(canPart(rest,dv)){suggestions.add(dv);break;}
+                      }
+                    }
+                  }
                 }
               }
               const opts = [...suggestions];
