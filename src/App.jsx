@@ -539,31 +539,39 @@ export default function Diloti() {
           <div style={{display:"flex",gap:6,alignItems:"center",flexWrap:"wrap"}}>
             {(()=>{
               const cv = G.selectedCard ? cardVal(G.selectedCard.rank) : null;
-              const selSum = G.selectedTable.reduce((a,tc)=>a+(tc.isDecl?tc.decl.value:cardVal(tc.rank)||0),0);
+              const sel = G.selectedTable;
+              const selSum = sel.reduce((a,tc)=>a+(tc.isDecl?tc.decl.value:cardVal(tc.rank)||0),0);
               const suggestions = new Set();
               if(cv && !isFace(G.selectedCard?.rank)) {
-                // plain sum
                 const plain = cv + selSum;
                 if(plain>=1&&plain<=10) suggestions.add(plain);
-                // if a decl is selected, raising
-                const selDecl = G.selectedTable.find(tc=>tc.isDecl);
+                const selDecl = sel.find(tc=>tc.isDecl);
                 if(selDecl) { const raised=selDecl.decl.value+cv; if(raised<=10) suggestions.add(raised); }
-                // group: if selSum>0 and selSum===cv, suggest cv
-                if(selSum>0&&selSum%cv===0) suggestions.add(cv);
+                if(sel.length>0 && cv>=1 && cv<=10) {
+                  // group: check if selSum is a multiple of cv (all components equal cv)
+                  if(selSum>0 && selSum%cv===0) suggestions.add(cv);
+                  // group: played card alone = cv, table cards sum = cv
+                  if(selSum===cv) suggestions.add(cv);
+                }
               }
-              return [...suggestions].map(v=>(
-                <button key={v} onClick={()=>setG(prev=>({...prev,declValue:String(v)}))}
-                  style={{padding:"5px 10px",borderRadius:8,border:`2px solid ${G.declValue===String(v)?C.gold:C.panelBorder}`,background:G.declValue===String(v)?"rgba(201,168,76,0.25)":"rgba(0,0,0,0.3)",color:C.text,cursor:"pointer",fontSize:13,fontWeight:600}}>
-                  {v}
-                </button>
-              ));
+              const opts = [...suggestions];
+              // Auto-select if only one option
+              if(opts.length===1 && G.declValue!==String(opts[0])) {
+                setTimeout(()=>setG(prev=>({...prev,declValue:String(opts[0])})),0);
+              }
+              if(opts.length===0) return (
+                <Btn onClick={handleDeclare}>Declare pile</Btn>
+              );
+              return (<>
+                {opts.map(v=>(
+                  <button key={v} onClick={()=>setG(prev=>({...prev,declValue:String(v)}))}
+                    style={{padding:"6px 14px",borderRadius:8,border:`2px solid ${G.declValue===String(v)?C.gold:C.panelBorder}`,background:G.declValue===String(v)?"rgba(201,168,76,0.3)":"rgba(0,0,0,0.25)",color:G.declValue===String(v)?C.gold:C.text,cursor:"pointer",fontSize:13,fontWeight:700}}>
+                    Declare {v}
+                  </button>
+                ))}
+                <Btn onClick={handleDeclare}>Confirm</Btn>
+              </>);
             })()}
-            <input type="number" min={1} max={10} placeholder="or type 1–10"
-              value={G.declValue}
-              onChange={e=>setG(prev=>({...prev,declValue:e.target.value}))}
-              style={{width:90,padding:"6px 8px",borderRadius:8,border:`1px solid ${C.panelBorder}`,background:"rgba(0,0,0,0.3)",color:C.text,fontSize:12,outline:"none"}}
-            />
-            <Btn onClick={handleDeclare}>Declare pile</Btn>
           </div>
         </>)}
         {aiThinking&&<span style={{fontSize:12,color:C.textMuted,fontStyle:"italic"}}>AI is thinking…</span>}
