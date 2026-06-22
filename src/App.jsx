@@ -587,11 +587,9 @@ export default function Diloti() {
     }}>
 
       {/* Header */}
-      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14}}>
-        <div style={{display:"flex",alignItems:"center",gap:8}}>
-          <span style={{fontSize:20,fontWeight:800,color:C.gold,letterSpacing:"0.04em",textShadow:`0 1px 6px rgba(0,0,0,0.4)`}}>{L.title}</span>
-        </div>
-        <div style={{display:"flex",gap:6,flexWrap:"wrap",justifyContent:"flex-end"}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14,flexWrap:"wrap",gap:8}}>
+        <span style={{fontSize:22,fontWeight:800,color:C.gold,letterSpacing:"0.04em",textShadow:`0 1px 6px rgba(0,0,0,0.4)`}}>{L.title}</span>
+        <div style={{display:"flex",gap:6,alignItems:"center",flexShrink:0}}>
           <button onClick={()=>setLang(l=>l==="en"?"gr":"en")} style={{padding:"5px 8px",borderRadius:8,border:`1px solid ${C.panelBorder}`,background:"rgba(255,255,255,0.1)",color:C.text,cursor:"pointer",fontSize:11,fontWeight:600,whiteSpace:"nowrap"}}>
             {lang==="en"?"🇬🇷 GR":"🇬🇧 EN"}
           </button>
