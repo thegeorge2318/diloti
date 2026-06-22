@@ -239,8 +239,9 @@ const RULES = {
   Declaring: (<div style={{fontSize:13,lineHeight:1.75,color:"#374151"}}>
     <p style={{fontWeight:700,marginBottom:3}}>Plain pile</p><p style={{marginBottom:8}}>Play a card + select table cards whose total equals your declared value. You must hold another card of that value to "protect" it.</p>
     <p style={{fontWeight:700,marginBottom:3}}>Group / family</p><p style={{marginBottom:8}}>Combine cards/piles that each equal the same value (e.g. three 8s, or 3+5 grouped with an 8). Only capturable as a whole.</p>
-    <p style={{fontWeight:700,marginBottom:3}}>Raising</p><p style={{marginBottom:8}}>Add a card to your opponent's declaration to raise its value (max 10). You cannot raise your own.</p>
-    <p style={{fontWeight:700,marginBottom:3}}>Adding to your own</p><p>You can add a card to your own pile only if it keeps the same declared value (forming a group).</p>
+    <p style={{fontWeight:700,marginBottom:3}}>Raising</p><p style={{marginBottom:8}}>Add a card to your opponent's declaration to raise its value (max 10), merging it onto your own pile.</p>
+    <p style={{fontWeight:700,marginBottom:3}}>Adding to your own</p><p style={{marginBottom:8}}>You can add to your own declaration if it keeps the same value (forming a group, e.g. adding more 9s).</p>
+    <p style={{fontWeight:700,marginBottom:3}}>Must pick up</p><p>Once you have a declaration on the table, on your next turn you must capture or add to a pile. You cannot lay a card or make a second declaration until you pick up your existing one.</p>
   </div>),
   Scoring: (<div style={{fontSize:13,lineHeight:1.75,color:"#374151"}}>
     <p style={{marginBottom:8}}>11 points available per round, plus xeri bonuses:</p>
@@ -415,6 +416,8 @@ export default function Diloti() {
   const handleLay=()=>{
     const card=G.selectedCard;
     if(!card){update(s=>{s.log="Select a card from your hand first.";}); return;}
+    const myDecl=G.tableCards.find(tc=>tc.isDecl&&tc.decl?.owner==="player");
+    if(myDecl){update(s=>{s.log="You have a declaration on the table — you must capture or add to a pile, not lay a card.";}); return;}
     if(isFace(card.rank)&&G.tableCards.some(tc=>tc.rank===card.rank)){update(s=>{s.log="You must capture the matching face card.";}); return;}
     setG(prev=>{
       const next={...prev,playerHand:prev.playerHand.filter(c=>c.id!==card.id),tableCards:[...prev.tableCards,{...card,decl:null}],selectedCard:null,selectedTable:[],turn:"ai",log:`You laid the ${card.rank}${card.suit} on the table.`};
@@ -443,6 +446,15 @@ export default function Diloti() {
 
     const selDecls=sel.filter(tc=>tc.isDecl);
     const selLoose=sel.filter(tc=>!tc.isDecl);
+
+    // Block making a brand-new declaration if player already has one on the table
+    // (adding to existing own decl via selDecls is still allowed)
+    const myExistingDecl=G.tableCards.find(tc=>tc.isDecl&&tc.decl?.owner==="player");
+    const isAddingToOwn=selDecls.length===1&&selDecls[0].decl?.owner==="player";
+    const isRaisingOpponent=selDecls.length===1&&selDecls[0].decl?.owner==="ai";
+    if(myExistingDecl&&!isAddingToOwn&&!isRaisingOpponent){
+      update(s=>{s.log="You already have a declaration on the table — pick it up before making a new one.";}); return;
+    }
 
     if(selDecls.length===1){
       const ed=selDecls[0];
