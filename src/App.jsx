@@ -85,8 +85,25 @@ function Card({card, selected, tableSelected, onClick, faceDown}) {
   };
 
   if(faceDown) return (
-    <div style={{...base, background:`repeating-linear-gradient(45deg,#1a3a8f,#1a3a8f 4px,#1e45ab 4px,#1e45ab 8px)`, border:`2px solid #2a4fc0`, borderRadius:8, display:"flex",alignItems:"center",justifyContent:"center"}}>
-      <div style={{width:W-14,height:H-14,borderRadius:5,border:"1.5px solid rgba(255,255,255,0.25)",background:"rgba(255,255,255,0.05)"}} />
+    <div style={{...base, background:"#1a3a6e", border:"2px solid #c9a84c", borderRadius:8}}>
+      <svg width={W} height={H} xmlns="http://www.w3.org/2000/svg" style={{position:"absolute",top:0,left:0}}>
+        <rect x="4" y="4" width={W-8} height={H-8} rx="4" fill="none" stroke="#c9a84c" strokeWidth="1.5"/>
+        {/* Greek key TL */}
+        <path d={`M8,8 h9 v4 h-5 v4 h3 v3 h-7 v-11z M11,11 h2 v4 h-2z`} fill="#c9a84c" opacity="0.85"/>
+        {/* Greek key TR */}
+        <path d={`M${W-8},8 h-9 v4 h5 v4 h-3 v3 h7 v-11z M${W-11},11 h-2 v4 h2z`} fill="#c9a84c" opacity="0.85"/>
+        {/* Greek key BL */}
+        <path d={`M8,${H-8} h9 v-4 h-5 v-4 h3 v-3 h-7 v11z M11,${H-11} h2 v-4 h-2z`} fill="#c9a84c" opacity="0.85"/>
+        {/* Greek key BR */}
+        <path d={`M${W-8},${H-8} h-9 v-4 h5 v-4 h-3 v-3 h7 v11z M${W-11},${H-11} h-2 v-4 h2z`} fill="#c9a84c" opacity="0.85"/>
+        {/* 16-point Vergina star */}
+        <g transform={`translate(${W/2},${H/2})`}>
+          {[0,22.5,45,67.5,90,112.5,135,157.5,180,202.5,225,247.5,270,292.5,315,337.5].map(a=>(
+            <polygon key={a} points="0,-18 2,-6 0,-8 -2,-6" fill="#c9a84c" opacity="0.95" transform={`rotate(${a})`}/>
+          ))}
+          <circle r="5" fill="#c9a84c" opacity="0.95"/>
+        </g>
+      </svg>
     </div>
   );
 
@@ -100,18 +117,32 @@ function Card({card, selected, tableSelected, onClick, faceDown}) {
     </div>
   );
 
+  const faceSymbol = card.rank==="K"?"♚":card.rank==="Q"?"♛":"♞";
+  const faceColor = isRed?"#c0392b":"#1a1a6e";
+  const faceBg = isRed?"linear-gradient(155deg,#fff0f0,#ffd6d6)":"linear-gradient(155deg,#f0f0ff,#d8d8f5)";
+
+  if(isFace(card.rank)) return (
+    <div style={{...base, background:faceBg, border:`2px solid ${faceColor}`, display:"flex", flexDirection:"column", justifyContent:"space-between", padding:"5px 6px", overflow:"hidden"}} onClick={onClick}>
+      <div style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",fontSize:52,fontWeight:900,color:faceColor,opacity:0.08,lineHeight:1,pointerEvents:"none",userSelect:"none"}}>{card.rank}</div>
+      <div style={{display:"flex",flexDirection:"column",alignItems:"flex-start",lineHeight:1,position:"relative"}}>
+        <span style={{fontSize:13,fontWeight:800,color:faceColor}}>{card.rank}</span>
+        <span style={{fontSize:10,color:faceColor}}>{card.suit}</span>
+      </div>
+      <div style={{textAlign:"center",fontSize:28,lineHeight:1,position:"relative",color:faceColor}}>{faceSymbol}</div>
+      <div style={{display:"flex",flexDirection:"column",alignItems:"flex-end",lineHeight:1,transform:"rotate(180deg)",position:"relative"}}>
+        <span style={{fontSize:13,fontWeight:800,color:faceColor}}>{card.rank}</span>
+        <span style={{fontSize:10,color:faceColor}}>{card.suit}</span>
+      </div>
+    </div>
+  );
+
   return (
     <div style={{...base, background:C.cream, border:`1.5px solid #d4c9b0`, display:"flex", flexDirection:"column", justifyContent:"space-between", padding:"5px 6px"}} onClick={onClick}>
-      {/* top-left */}
       <div style={{display:"flex",flexDirection:"column",alignItems:"flex-start",lineHeight:1}}>
         <span style={{fontSize:13,fontWeight:700,color:isRed?C.red:"#1a1a1a"}}>{card.rank}</span>
         <span style={{fontSize:11,color:isRed?C.red:"#1a1a1a"}}>{card.suit}</span>
       </div>
-      {/* centre */}
-      <div style={{textAlign:"center",fontSize:isFace(card.rank)?28:22,color:isRed?C.red:"#1a1a1a",lineHeight:1}}>
-        {card.rank==="K"?"♔":card.rank==="Q"?"♕":card.rank==="J"?"♖":card.suit}
-      </div>
-      {/* bottom-right rotated */}
+      <div style={{textAlign:"center",fontSize:22,color:isRed?C.red:"#1a1a1a",lineHeight:1}}>{card.suit}</div>
       <div style={{display:"flex",flexDirection:"column",alignItems:"flex-end",lineHeight:1,transform:"rotate(180deg)"}}>
         <span style={{fontSize:13,fontWeight:700,color:isRed?C.red:"#1a1a1a"}}>{card.rank}</span>
         <span style={{fontSize:11,color:isRed?C.red:"#1a1a1a"}}>{card.suit}</span>
@@ -505,11 +536,32 @@ export default function Diloti() {
         {G.turn==="player"&&!G.gameOver&&!G.roundOver&&(<>
           <Btn onClick={handleCapture} primary>Capture</Btn>
           <Btn onClick={handleLay}>Lay card</Btn>
-          <div style={{display:"flex",gap:6,alignItems:"center"}}>
-            <input type="number" min={1} max={10} placeholder="1–10"
+          <div style={{display:"flex",gap:6,alignItems:"center",flexWrap:"wrap"}}>
+            {(()=>{
+              const cv = G.selectedCard ? cardVal(G.selectedCard.rank) : null;
+              const selSum = G.selectedTable.reduce((a,tc)=>a+(tc.isDecl?tc.decl.value:cardVal(tc.rank)||0),0);
+              const suggestions = new Set();
+              if(cv && !isFace(G.selectedCard?.rank)) {
+                // plain sum
+                const plain = cv + selSum;
+                if(plain>=1&&plain<=10) suggestions.add(plain);
+                // if a decl is selected, raising
+                const selDecl = G.selectedTable.find(tc=>tc.isDecl);
+                if(selDecl) { const raised=selDecl.decl.value+cv; if(raised<=10) suggestions.add(raised); }
+                // group: if selSum>0 and selSum===cv, suggest cv
+                if(selSum>0&&selSum%cv===0) suggestions.add(cv);
+              }
+              return [...suggestions].map(v=>(
+                <button key={v} onClick={()=>setG(prev=>({...prev,declValue:String(v)}))}
+                  style={{padding:"5px 10px",borderRadius:8,border:`2px solid ${G.declValue===String(v)?C.gold:C.panelBorder}`,background:G.declValue===String(v)?"rgba(201,168,76,0.25)":"rgba(0,0,0,0.3)",color:C.text,cursor:"pointer",fontSize:13,fontWeight:600}}>
+                  {v}
+                </button>
+              ));
+            })()}
+            <input type="number" min={1} max={10} placeholder="or type 1–10"
               value={G.declValue}
               onChange={e=>setG(prev=>({...prev,declValue:e.target.value}))}
-              style={{width:60,padding:"6px 8px",borderRadius:8,border:`1px solid ${C.panelBorder}`,background:"rgba(0,0,0,0.3)",color:C.text,fontSize:13,outline:"none"}}
+              style={{width:90,padding:"6px 8px",borderRadius:8,border:`1px solid ${C.panelBorder}`,background:"rgba(0,0,0,0.3)",color:C.text,fontSize:12,outline:"none"}}
             />
             <Btn onClick={handleDeclare}>Declare pile</Btn>
           </div>
