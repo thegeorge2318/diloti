@@ -23,6 +23,75 @@ const C = {
   selected:   "#f59e0b",
 };
 
+// ── translations ─────────────────────────────────────────────────────────────
+const T = {
+  en: {
+    title: "DILOTI", subtitle: "Diloti",
+    rules: "📖 Rules", newGame: "New Game",
+    you: "YOU", ai: "AI", target: "TARGET",
+    aiHand: "AI HAND", table: "TABLE", yourHand: "YOUR HAND",
+    captured: "captured", xeri: "xeri", inStock: "in stock",
+    capture: "Capture", layCard: "Lay card", declarePile: "Declare pile",
+    declare: "Declare", confirm: "Confirm",
+    aiThinking: "AI is thinking…",
+    roundOver: "Round over", nextRound: "Next round →",
+    playAgain: "Play again",
+    selectCard: "Your turn — select a card from your hand.",
+    noCards: "No cards", tableEmpty: "Table is empty",
+    rulesTitle: "How to play Diloti",
+    tabs: ["Overview","Capturing","Declaring","Scoring"],
+  },
+  gr: {
+    title: "ΔΗΛΩΤΗ", subtitle: "Δηλωτή",
+    rules: "📖 Κανόνες", newGame: "Νέο Παιχνίδι",
+    you: "ΕΣΥΣ", ai: "ΑΙ", target: "ΣΤΟΧΟΣ",
+    aiHand: "ΧΑΡΤΙΑ ΑΙ", table: "ΤΡΑΠΕΖΙ", yourHand: "ΤΑ ΧΑΡΤΙΑ ΣΟΥ",
+    captured: "πιάστηκαν", xeri: "ξερί", inStock: "στη τράπουλα",
+    capture: "Πάρε", layCard: "Άφησε", declarePile: "Δήλωσε",
+    declare: "Δήλωσε", confirm: "Επιβεβαίωσε",
+    aiThinking: "Το ΑΙ σκέφτεται…",
+    roundOver: "Τέλος γύρου", nextRound: "Επόμενος γύρος →",
+    playAgain: "Παίξε ξανά",
+    selectCard: "Η σειρά σου — διάλεξε χαρτί.",
+    noCards: "Κανένα χαρτί", tableEmpty: "Το τραπέζι είναι άδειο",
+    rulesTitle: "Πώς να παίξεις Δηλωτή",
+    tabs: ["Γενικά","Πάρσιμο","Δηλώσεις","Βαθμολογία"],
+  },
+};
+
+const RULES_GR = {
+  "Γενικά": (<div style={{fontSize:13,lineHeight:1.75,color:"#374151"}}>
+    <p style={{marginBottom:8}}>Η Δηλωτή είναι κλασικό ελληνικό χαρτοπαίγνιο. Παίζετε εναλλάξ για να πιάνετε χαρτιά από το τραπέζι.</p>
+    <p style={{fontWeight:700,marginBottom:3}}>Στήσιμο</p>
+    <ul style={{paddingLeft:18,marginBottom:8}}><li>6 χαρτιά σε κάθε παίκτη, 4 ανοιχτά στο τραπέζι</li><li>Εσύ παίζεις πρώτος. Νέα χαρτιά μοιράζονται όταν αδειάσουν τα χέρια.</li></ul>
+    <p style={{fontWeight:700,marginBottom:3}}>Η σειρά σου</p>
+    <p>Διάλεξε χαρτί από το χέρι σου, μετά <b>Πάρε</b>, <b>Άφησε</b>, ή <b>Δήλωσε</b>.</p>
+  </div>),
+  "Πάρσιμο": (<div style={{fontSize:13,lineHeight:1.75,color:"#374151"}}>
+    <p style={{fontWeight:700,marginBottom:3}}>Ίδιο νούμερο</p><p style={{marginBottom:8}}>Παίξε ένα 7 για να πάρεις ένα 7 από το τραπέζι.</p>
+    <p style={{fontWeight:700,marginBottom:3}}>Άθροισμα</p><p style={{marginBottom:8}}>Παίξε ένα 9 για να πάρεις 4+5. Μπορείς να πάρεις πολλούς συνδυασμούς ταυτόχρονα.</p>
+    <p style={{fontWeight:700,marginBottom:3}}>Φιγούρες (J, Q, K)</p><p style={{marginBottom:8}}>Χωρίς αριθμητική αξία — πιάνουν μόνο μία φιγούρα του ίδιου είδους.</p>
+    <p style={{fontWeight:700,marginBottom:3}}>Άφεσε χαρτί</p><p>Αφήνεις χαρτί αν δεν θέλεις να πάρεις. Αλλά αν έχεις δήλωση, πρέπει να πάρεις.</p>
+  </div>),
+  "Δηλώσεις": (<div style={{fontSize:13,lineHeight:1.75,color:"#374151"}}>
+    <p style={{fontWeight:700,marginBottom:3}}>Απλή δήλωση</p><p style={{marginBottom:8}}>Παίξε χαρτί μαζί με χαρτιά από το τραπέζι που το άθροισμά τους ισούται με τη δηλωμένη αξία. Πρέπει να έχεις άλλο χαρτί ίδιας αξίας στο χέρι.</p>
+    <p style={{fontWeight:700,marginBottom:3}}>Οικογένεια</p><p style={{marginBottom:8}}>Ομαδοποίησε χαρτιά ίδιας αξίας (π.χ. τρία 8άρια). Παίρνονται μόνο ως σύνολο.</p>
+    <p style={{fontWeight:700,marginBottom:3}}>Ανέβασμα</p><p style={{marginBottom:8}}>Πρόσθεσε χαρτί στη δήλωση του αντιπάλου για να ανεβάσεις την αξία (μέχρι 10).</p>
+    <p style={{fontWeight:700,marginBottom:3}}>Υποχρέωση</p><p>Αν έχεις δήλωση στο τραπέζι, <b>πρέπει</b> να πάρεις ή να προσθέσεις στη δήλωση. Δεν μπορείς να αφήσεις χαρτί ή να κάνεις νέα δήλωση.</p>
+  </div>),
+  "Βαθμολογία": (<div style={{fontSize:13,lineHeight:1.75,color:"#374151"}}>
+    <p style={{marginBottom:8}}>11 πόντοι ανά γύρο, συν ξερί:</p>
+    <ul style={{paddingLeft:18,marginBottom:8}}>
+      <li><b>+4</b> — περισσότερα χαρτιά (ισοπαλία 26-26: κανείς δεν παίρνει)</li>
+      <li><b>+1 έκαστο</b> — Άσοι (4 διαθέσιμοι)</li>
+      <li><b>+2</b> — το 10♦ ("το καλό δέκα")</li>
+      <li><b>+1</b> — το 2♣ ("το καλό δύο")</li>
+      <li><b>+10</b> — ανά ξερί</li>
+    </ul>
+    <p><b>Πρώτος στους 61 πόντους κερδίζει.</b></p>
+  </div>),
+};
+
 function cardVal(r) { if(r==="A")return 1; const n=parseInt(r); return isNaN(n)?null:n; }
 function isFace(r) { return ["J","Q","K"].includes(r); }
 function makeDeck() { const d=[]; for(const s of SUITS)for(const r of RANKS)d.push({rank:r,suit:s,id:r+s}); return d; }
@@ -36,7 +105,7 @@ function newGameState(prev={player:0,ai:0}) {
     playerPile:[], aiPile:[], playerXeri:0, aiXeri:0,
     playerTotal:prev.player, aiTotal:prev.ai,
     lastCapture:null, turn:"player", selectedCard:null, selectedTable:[],
-    declValue:"", log:"Your turn — select a card from your hand.",
+    declValue:"", log:"Your turn — select a card from your hand."  // overridden by L.selectCard in render,
     gameOver:null, roundOver:null,
   };
 }
@@ -259,8 +328,10 @@ const RULES = {
 // ── Main component ────────────────────────────────────────────────────────────
 export default function Diloti() {
   const [G, setG] = useState(()=>newGameState());
+  const [lang, setLang] = useState("en");
+  const L = T[lang];
   const [showRules, setShowRules] = useState(false);
-  const [rulesTab, setRulesTab] = useState("Overview");
+  const [rulesTab, setRulesTab] = useState(0);
   const [aiThinking, setAiThinking] = useState(false);
 
   const update = fn => setG(prev=>{const next={...prev};fn(next);return next;});
@@ -518,44 +589,47 @@ export default function Diloti() {
       {/* Header */}
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14}}>
         <div style={{display:"flex",alignItems:"center",gap:8}}>
-          <span style={{fontSize:20,fontWeight:800,color:C.gold,letterSpacing:"0.04em",textShadow:`0 1px 6px rgba(0,0,0,0.4)`}}>ΔΗΛΩΤΗ</span>
-          <span style={{fontSize:11,color:C.textMuted,marginTop:2}}>Diloti</span>
+          <span style={{fontSize:20,fontWeight:800,color:C.gold,letterSpacing:"0.04em",textShadow:`0 1px 6px rgba(0,0,0,0.4)`}}>{L.title}</span>
+          <span style={{fontSize:11,color:C.textMuted,marginTop:2}}>{L.subtitle}</span>
         </div>
         <div style={{display:"flex",gap:6}}>
-          <Btn onClick={()=>setShowRules(true)}>📖 Rules</Btn>
-          <Btn onClick={startNewGame} primary>New Game</Btn>
+          <button onClick={()=>setLang(l=>l==="en"?"gr":"en")} style={{padding:"6px 10px",borderRadius:8,border:`1px solid ${C.panelBorder}`,background:"rgba(255,255,255,0.1)",color:C.text,cursor:"pointer",fontSize:13,fontWeight:600}}>
+            {lang==="en"?"🇬🇷 GR":"🇬🇧 EN"}
+          </button>
+          <Btn onClick={()=>setShowRules(true)}>{L.rules}</Btn>
+          <Btn onClick={startNewGame} primary>{L.newGame}</Btn>
         </div>
       </div>
 
       {/* Scores */}
       <div style={{display:"flex",gap:8,justifyContent:"center",marginBottom:14}}>
-        <ScorePill label="You" value={G.playerTotal} />
-        <ScorePill label="Target" value={61} highlight />
-        <ScorePill label="AI" value={G.aiTotal} />
+        <ScorePill label={L.you} value={G.playerTotal} />
+        <ScorePill label={L.target} value={61} highlight />
+        <ScorePill label={L.ai} value={G.aiTotal} />
       </div>
 
       {/* AI hand */}
-      <Zone label="AI Hand" info={`${G.aiPile.length} captured · ${G.aiXeri} xeri · ${G.deck.length} in stock`}
-        cards={G.aiHand} faceDown emptyText="No cards" accent={C.textMuted} />
+      <Zone label={L.aiHand} info={`${G.aiPile.length} ${L.captured} · ${G.aiXeri} ${L.xeri} · ${G.deck.length} ${L.inStock}`}
+        cards={G.aiHand} faceDown emptyText={L.noCards} accent={C.textMuted} />
 
       {/* Table */}
-      <Zone label="Table" cards={G.tableCards}
+      <Zone label={L.table} cards={G.tableCards}
         tableSelectedIds={G.selectedTable.map(c=>c.id)}
         onCardClick={handleSelectTable}
-        emptyText="Table is empty" accent={C.goldLight} />
+        emptyText={L.tableEmpty} accent={C.goldLight} />
 
       {/* Player hand */}
-      <Zone label="Your Hand" info={`${G.playerPile.length} captured · ${G.playerXeri} xeri`}
+      <Zone label={L.yourHand} info={`${G.playerPile.length} ${L.captured} · ${G.playerXeri} ${L.xeri}`}
         cards={G.playerHand}
         selectedIds={G.selectedCard?[G.selectedCard.id]:[]}
         onCardClick={handleSelectHand}
-        emptyText="No cards" accent={C.gold} />
+        emptyText={L.noCards} accent={C.gold} />
 
       {/* Actions */}
       <div style={{display:"flex",gap:8,flexWrap:"wrap",alignItems:"center",marginTop:10,minHeight:38}}>
         {G.turn==="player"&&!G.gameOver&&!G.roundOver&&(<>
-          <Btn onClick={handleCapture} primary>Capture</Btn>
-          <Btn onClick={handleLay}>Lay card</Btn>
+          <Btn onClick={handleCapture} primary>{L.capture}</Btn>
+          <Btn onClick={handleLay}>{L.layCard}</Btn>
           <div style={{display:"flex",gap:6,alignItems:"center",flexWrap:"wrap"}}>
             {(()=>{
               const cv = G.selectedCard ? cardVal(G.selectedCard.rank) : null;
@@ -605,7 +679,7 @@ export default function Diloti() {
                 setTimeout(()=>setG(prev=>({...prev,declValue:String(opts[0])})),0);
               }
               if(opts.length===0) return (
-                <Btn onClick={handleDeclare}>Declare pile</Btn>
+                <Btn onClick={handleDeclare}>{L.declarePile}</Btn>
               );
               return (<>
                 {opts.map(v=>(
@@ -618,7 +692,7 @@ export default function Diloti() {
             })()}
           </div>
         </>)}
-        {aiThinking&&<span style={{fontSize:12,color:C.textMuted,fontStyle:"italic"}}>AI is thinking…</span>}
+        {aiThinking&&<span style={{fontSize:12,color:C.textMuted,fontStyle:"italic"}}>{L.aiThinking}</span>}
       </div>
 
       {/* Log */}
@@ -650,9 +724,9 @@ export default function Diloti() {
         <div style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.6)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:50,borderRadius:16}}>
           <div style={{background:"white",borderRadius:14,padding:28,maxWidth:360,width:"90%",textAlign:"center"}}>
             <div style={{fontSize:32,marginBottom:8}}>🃏</div>
-            <div style={{fontSize:18,fontWeight:700,marginBottom:8}}>Round over</div>
+            <div style={{fontSize:18,fontWeight:700,marginBottom:8}}>{L.roundOver}</div>
             <div style={{fontSize:13,color:"#6b7280",marginBottom:20,lineHeight:1.6}}>{G.roundOver}</div>
-            <button onClick={startNewRound} style={{padding:"10px 24px",borderRadius:8,border:"none",background:C.gold,color:"#2a1800",cursor:"pointer",fontSize:14,fontWeight:700}}>Next round →</button>
+            <button onClick={startNewRound} style={{padding:"10px 24px",borderRadius:8,border:"none",background:C.gold,color:"#2a1800",cursor:"pointer",fontSize:14,fontWeight:700}}>{L.nextRound}</button>
           </div>
         </div>
       )}
@@ -663,7 +737,7 @@ export default function Diloti() {
             <div style={{fontSize:40,marginBottom:10}}>{G.gameOver.winner.includes("You")?"🏆":"🤖"}</div>
             <div style={{fontSize:20,fontWeight:800,marginBottom:8}}>{G.gameOver.winner}</div>
             <div style={{fontSize:13,color:"#6b7280",marginBottom:22,lineHeight:1.6}}>{G.gameOver.summary}</div>
-            <button onClick={startNewGame} style={{padding:"10px 24px",borderRadius:8,border:"none",background:C.gold,color:"#2a1800",cursor:"pointer",fontSize:14,fontWeight:700}}>Play again</button>
+            <button onClick={startNewGame} style={{padding:"10px 24px",borderRadius:8,border:"none",background:C.gold,color:"#2a1800",cursor:"pointer",fontSize:14,fontWeight:700}}>{L.playAgain}</button>
           </div>
         </div>
       )}
