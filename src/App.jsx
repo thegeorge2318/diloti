@@ -685,7 +685,7 @@ export default function Diloti() {
                 {opts.map(v=>(
                   <button key={v} onClick={()=>handleDeclareWithValue(v)}
                     style={{padding:"6px 14px",borderRadius:8,border:`2px solid ${C.gold}`,background:"rgba(201,168,76,0.15)",color:C.gold,cursor:"pointer",fontSize:13,fontWeight:700}}>
-                    Declare {v}
+                    {L.declare} {v}
                   </button>
                 ))}
               </>);
@@ -705,17 +705,17 @@ export default function Diloti() {
         <div style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.6)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:50,borderRadius:16}}>
           <div style={{background:"white",borderRadius:14,padding:22,maxWidth:440,width:"92%",maxHeight:"80vh",overflowY:"auto"}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14}}>
-              <h2 style={{margin:0,fontSize:17,fontWeight:700}}>How to play Diloti</h2>
+              <h2 style={{margin:0,fontSize:17,fontWeight:700}}>{L.rulesTitle}</h2>
               <button onClick={()=>setShowRules(false)} style={{background:"none",border:"none",fontSize:20,cursor:"pointer",color:"#666"}}>✕</button>
             </div>
             <div style={{display:"flex",gap:6,marginBottom:14,flexWrap:"wrap"}}>
-              {Object.keys(RULES).map(tab=>(
-                <button key={tab} onClick={()=>setRulesTab(tab)} style={{padding:"4px 12px",borderRadius:6,fontSize:12,cursor:"pointer",fontWeight:600,border:"none",background:rulesTab===tab?C.gold:"#f3f4f6",color:rulesTab===tab?"#2a1800":"#374151"}}>
+              {L.tabs.map((tab,i)=>(
+                <button key={tab} onClick={()=>setRulesTab(i)} style={{padding:"4px 12px",borderRadius:6,fontSize:12,cursor:"pointer",fontWeight:600,border:"none",background:rulesTab===i?C.gold:"#f3f4f6",color:rulesTab===i?"#2a1800":"#374151"}}>
                   {tab}
                 </button>
               ))}
             </div>
-            {RULES[rulesTab]}
+            {lang==="en" ? Object.values(RULES)[rulesTab] : Object.values(RULES_GR)[rulesTab]}
           </div>
         </div>
       )}
