@@ -423,11 +423,19 @@ export default function Diloti() {
     });
   };
 
+  const handleDeclareWithValue = (v) => {
+    handleDeclareCore(v);
+  };
+
   const handleDeclare=()=>{
+    handleDeclareCore(parseInt(G.declValue));
+  };
+
+  const handleDeclareCore=(dvIn)=>{
     const card=G.selectedCard;
     if(!card){update(s=>{s.log="Select a card from your hand first.";}); return;}
     if(isFace(card.rank)){update(s=>{s.log="Face cards can't be part of declarations.";}); return;}
-    const dv=parseInt(G.declValue);
+    const dv=dvIn;
     if(!dv||dv<1||dv>10){update(s=>{s.log="Enter a valid declaration value (1–10).";}); return;}
     const sel=G.selectedTable;
     const cv=cardVal(card.rank);
@@ -564,12 +572,11 @@ export default function Diloti() {
               );
               return (<>
                 {opts.map(v=>(
-                  <button key={v} onClick={()=>setG(prev=>({...prev,declValue:String(v)}))}
-                    style={{padding:"6px 14px",borderRadius:8,border:`2px solid ${G.declValue===String(v)?C.gold:C.panelBorder}`,background:G.declValue===String(v)?"rgba(201,168,76,0.3)":"rgba(0,0,0,0.25)",color:G.declValue===String(v)?C.gold:C.text,cursor:"pointer",fontSize:13,fontWeight:700}}>
+                  <button key={v} onClick={()=>handleDeclareWithValue(v)}
+                    style={{padding:"6px 14px",borderRadius:8,border:`2px solid ${C.gold}`,background:"rgba(201,168,76,0.15)",color:C.gold,cursor:"pointer",fontSize:13,fontWeight:700}}>
                     Declare {v}
                   </button>
                 ))}
-                <Btn onClick={handleDeclare}>Confirm</Btn>
               </>);
             })()}
           </div>
