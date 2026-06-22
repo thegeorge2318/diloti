@@ -133,7 +133,7 @@ function findCombos(value, tableCards) {
 // ── Card component ────────────────────────────────────────────────────────────
 function Card({card, selected, tableSelected, onClick, faceDown}) {
   const isRed = RED_SUITS.includes(card?.suit);
-  const W=58, H=84;
+  const W=70, H=100;
 
   const shadow = selected
     ? `0 0 0 3px ${C.selected}, 0 6px 20px rgba(0,0,0,0.5)`
@@ -179,7 +179,7 @@ function Card({card, selected, tableSelected, onClick, faceDown}) {
   if(card.isDecl) return (
     <div style={{...base, background:"linear-gradient(135deg,#1e3a8a,#1d4ed8)", border:`2px solid ${C.gold}`, display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"}} onClick={onClick}>
       <div style={{fontSize:9,color:C.goldLight,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:1}}>Decl</div>
-      <div style={{fontSize:22,fontWeight:800,color:C.goldLight,lineHeight:1}}>{card.decl.value}</div>
+      <div style={{fontSize:26,fontWeight:800,color:C.goldLight,lineHeight:1}}>{card.decl.value}</div>
       <div style={{fontSize:8,color:"rgba(255,255,255,0.6)",marginTop:3,textAlign:"center",padding:"0 4px",lineHeight:1.3}}>
         {card.cards?.map(c=>c.rank+c.suit).join("+")}
       </div>
@@ -194,13 +194,13 @@ function Card({card, selected, tableSelected, onClick, faceDown}) {
     <div style={{...base, background:faceBg, border:`2px solid ${faceColor}`, display:"flex", flexDirection:"column", justifyContent:"space-between", padding:"5px 6px", overflow:"hidden"}} onClick={onClick}>
       <div style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",fontSize:52,fontWeight:900,color:faceColor,opacity:0.08,lineHeight:1,pointerEvents:"none",userSelect:"none"}}>{card.rank}</div>
       <div style={{display:"flex",flexDirection:"column",alignItems:"flex-start",lineHeight:1,position:"relative"}}>
-        <span style={{fontSize:13,fontWeight:800,color:faceColor}}>{card.rank}</span>
-        <span style={{fontSize:10,color:faceColor}}>{card.suit}</span>
+        <span style={{fontSize:16,fontWeight:800,color:faceColor}}>{card.rank}</span>
+        <span style={{fontSize:13,color:faceColor}}>{card.suit}</span>
       </div>
-      <div style={{textAlign:"center",fontSize:28,lineHeight:1,position:"relative",color:faceColor}}>{faceSymbol}</div>
+      <div style={{textAlign:"center",fontSize:34,lineHeight:1,position:"relative",color:faceColor}}>{faceSymbol}</div>
       <div style={{display:"flex",flexDirection:"column",alignItems:"flex-end",lineHeight:1,transform:"rotate(180deg)",position:"relative"}}>
-        <span style={{fontSize:13,fontWeight:800,color:faceColor}}>{card.rank}</span>
-        <span style={{fontSize:10,color:faceColor}}>{card.suit}</span>
+        <span style={{fontSize:16,fontWeight:800,color:faceColor}}>{card.rank}</span>
+        <span style={{fontSize:13,color:faceColor}}>{card.suit}</span>
       </div>
     </div>
   );
@@ -208,13 +208,13 @@ function Card({card, selected, tableSelected, onClick, faceDown}) {
   return (
     <div style={{...base, background:C.cream, border:`1.5px solid #d4c9b0`, display:"flex", flexDirection:"column", justifyContent:"space-between", padding:"5px 6px"}} onClick={onClick}>
       <div style={{display:"flex",flexDirection:"column",alignItems:"flex-start",lineHeight:1}}>
-        <span style={{fontSize:13,fontWeight:700,color:isRed?C.red:"#1a1a1a"}}>{card.rank}</span>
-        <span style={{fontSize:11,color:isRed?C.red:"#1a1a1a"}}>{card.suit}</span>
+        <span style={{fontSize:16,fontWeight:700,color:isRed?C.red:"#1a1a1a"}}>{card.rank}</span>
+        <span style={{fontSize:13,color:isRed?C.red:"#1a1a1a"}}>{card.suit}</span>
       </div>
-      <div style={{textAlign:"center",fontSize:22,color:isRed?C.red:"#1a1a1a",lineHeight:1}}>{card.suit}</div>
+      <div style={{textAlign:"center",fontSize:28,color:isRed?C.red:"#1a1a1a",lineHeight:1}}>{card.suit}</div>
       <div style={{display:"flex",flexDirection:"column",alignItems:"flex-end",lineHeight:1,transform:"rotate(180deg)"}}>
-        <span style={{fontSize:13,fontWeight:700,color:isRed?C.red:"#1a1a1a"}}>{card.rank}</span>
-        <span style={{fontSize:11,color:isRed?C.red:"#1a1a1a"}}>{card.suit}</span>
+        <span style={{fontSize:16,fontWeight:700,color:isRed?C.red:"#1a1a1a"}}>{card.rank}</span>
+        <span style={{fontSize:13,color:isRed?C.red:"#1a1a1a"}}>{card.suit}</span>
       </div>
     </div>
   );
@@ -225,8 +225,8 @@ function Zone({label, info, cards, selectedIds, tableSelectedIds, onCardClick, f
   return (
     <div style={{marginBottom:10}}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:5}}>
-        <span style={{fontSize:10,fontWeight:700,color:accent||C.textMuted,letterSpacing:"0.12em",textTransform:"uppercase"}}>{label}</span>
-        {info && <span style={{fontSize:10,color:C.textMuted}}>{info}</span>}
+        <span style={{fontSize:12,fontWeight:700,color:accent||C.textMuted,letterSpacing:"0.1em",textTransform:"uppercase"}}>{label}</span>
+        {info && <span style={{fontSize:12,color:C.textMuted}}>{info}</span>}
       </div>
       <div style={{
         display:"flex", flexWrap:"wrap", gap:8, minHeight:100, alignItems:"center",
@@ -260,8 +260,8 @@ function ScorePill({label, value, highlight}) {
       border:`1px solid ${highlight?C.goldLight:C.panelBorder}`,
       textAlign:"center", minWidth:64,
     }}>
-      <div style={{fontSize:9,color:highlight?"#5a3a00":C.textMuted,fontWeight:700,letterSpacing:"0.1em",textTransform:"uppercase"}}>{label}</div>
-      <div style={{fontSize:20,fontWeight:800,color:highlight?"#2a1800":C.text,lineHeight:1.1}}>{value}</div>
+      <div style={{fontSize:11,color:highlight?"#5a3a00":C.textMuted,fontWeight:700,letterSpacing:"0.1em",textTransform:"uppercase"}}>{label}</div>
+      <div style={{fontSize:22,fontWeight:800,color:highlight?"#2a1800":C.text,lineHeight:1.1}}>{value}</div>
     </div>
   );
 }
@@ -273,9 +273,9 @@ function Btn({children, onClick, primary, danger, small}) {
     <button onClick={onClick}
       onMouseEnter={()=>setHover(true)} onMouseLeave={()=>setHover(false)}
       style={{
-        padding: small?"4px 10px":"8px 18px",
+        padding: small?"4px 10px":"9px 20px",
         borderRadius:8, border:"none", cursor:"pointer",
-        fontSize: small?11:13, fontWeight:600, letterSpacing:"0.02em",
+        fontSize: small?12:14, fontWeight:600, letterSpacing:"0.02em",
         transition:"all 0.15s",
         background: primary
           ? (hover?C.goldLight:C.gold)
@@ -590,10 +590,9 @@ export default function Diloti() {
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14}}>
         <div style={{display:"flex",alignItems:"center",gap:8}}>
           <span style={{fontSize:20,fontWeight:800,color:C.gold,letterSpacing:"0.04em",textShadow:`0 1px 6px rgba(0,0,0,0.4)`}}>{L.title}</span>
-          <span style={{fontSize:11,color:C.textMuted,marginTop:2}}>{L.subtitle}</span>
         </div>
-        <div style={{display:"flex",gap:6}}>
-          <button onClick={()=>setLang(l=>l==="en"?"gr":"en")} style={{padding:"6px 10px",borderRadius:8,border:`1px solid ${C.panelBorder}`,background:"rgba(255,255,255,0.1)",color:C.text,cursor:"pointer",fontSize:13,fontWeight:600}}>
+        <div style={{display:"flex",gap:6,flexWrap:"wrap",justifyContent:"flex-end"}}>
+          <button onClick={()=>setLang(l=>l==="en"?"gr":"en")} style={{padding:"5px 8px",borderRadius:8,border:`1px solid ${C.panelBorder}`,background:"rgba(255,255,255,0.1)",color:C.text,cursor:"pointer",fontSize:11,fontWeight:600,whiteSpace:"nowrap"}}>
             {lang==="en"?"🇬🇷 GR":"🇬🇧 EN"}
           </button>
           <Btn onClick={()=>setShowRules(true)}>{L.rules}</Btn>
@@ -696,7 +695,7 @@ export default function Diloti() {
       </div>
 
       {/* Log */}
-      <div style={{marginTop:10,padding:"8px 12px",borderRadius:8,background:"rgba(0,0,0,0.25)",border:`1px solid ${C.panelBorder}`,fontSize:12,color:C.text,minHeight:34,lineHeight:1.5}}>
+      <div style={{marginTop:10,padding:"8px 12px",borderRadius:8,background:"rgba(0,0,0,0.25)",border:`1px solid ${C.panelBorder}`,fontSize:14,color:C.text,minHeight:38,lineHeight:1.6}}>
         {G.log}
       </div>
 
