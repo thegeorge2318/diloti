@@ -133,7 +133,7 @@ function findCombos(value, tableCards) {
 // ── Card component ────────────────────────────────────────────────────────────
 function Card({card, selected, tableSelected, onClick, faceDown}) {
   const isRed = RED_SUITS.includes(card?.suit);
-  const W=72, H=115;
+  const W=70, H=100;
 
   const shadow = selected
     ? `0 0 0 3px ${C.selected}, 0 6px 20px rgba(0,0,0,0.5)`
@@ -197,7 +197,7 @@ function Card({card, selected, tableSelected, onClick, faceDown}) {
         <span style={{fontSize:16,fontWeight:800,color:faceColor}}>{card.rank}</span>
         <span style={{fontSize:13,color:faceColor}}>{card.suit}</span>
       </div>
-      <div style={{textAlign:"center",fontSize:48,lineHeight:1,position:"relative",color:faceColor}}>{faceSymbol}</div>
+      <div style={{textAlign:"center",fontSize:38,lineHeight:1,position:"relative",color:faceColor}}>{faceSymbol}</div>
       <div style={{display:"flex",flexDirection:"column",alignItems:"flex-end",lineHeight:1,transform:"rotate(180deg)",position:"relative"}}>
         <span style={{fontSize:16,fontWeight:800,color:faceColor}}>{card.rank}</span>
         <span style={{fontSize:13,color:faceColor}}>{card.suit}</span>
@@ -206,15 +206,15 @@ function Card({card, selected, tableSelected, onClick, faceDown}) {
   );
 
   return (
-    <div style={{...base, background:C.cream, border:`1.5px solid #d4c9b0`, display:"flex", flexDirection:"column", justifyContent:"space-between", padding:"5px 6px"}} onClick={onClick}>
-      <div style={{display:"flex",flexDirection:"column",alignItems:"flex-start",lineHeight:1}}>
-        <span style={{fontSize:16,fontWeight:700,color:isRed?C.red:"#1a1a1a"}}>{card.rank}</span>
-        <span style={{fontSize:13,color:isRed?C.red:"#1a1a1a"}}>{card.suit}</span>
+    <div style={{...base, background:C.cream, border:`1.5px solid #d4c9b0`, display:"flex", flexDirection:"column", justifyContent:"space-between", padding:"5px 6px", overflow:"hidden"}} onClick={onClick}>
+      <div style={{display:"flex",flexDirection:"column",alignItems:"flex-start",lineHeight:1,flexShrink:0}}>
+        <span style={{fontSize:15,fontWeight:700,color:isRed?C.red:"#1a1a1a"}}>{card.rank}</span>
+        <span style={{fontSize:12,color:isRed?C.red:"#1a1a1a"}}>{card.suit}</span>
       </div>
-      <div style={{textAlign:"center",fontSize:42,color:isRed?C.red:"#1a1a1a",lineHeight:1}}>{card.suit}</div>
-      <div style={{display:"flex",flexDirection:"column",alignItems:"flex-end",lineHeight:1,transform:"rotate(180deg)"}}>
-        <span style={{fontSize:16,fontWeight:700,color:isRed?C.red:"#1a1a1a"}}>{card.rank}</span>
-        <span style={{fontSize:13,color:isRed?C.red:"#1a1a1a"}}>{card.suit}</span>
+      <div style={{textAlign:"center",fontSize:36,color:isRed?C.red:"#1a1a1a",lineHeight:1,flexShrink:0}}>{card.suit}</div>
+      <div style={{display:"flex",flexDirection:"column",alignItems:"flex-end",lineHeight:1,transform:"rotate(180deg)",flexShrink:0}}>
+        <span style={{fontSize:15,fontWeight:700,color:isRed?C.red:"#1a1a1a"}}>{card.rank}</span>
+        <span style={{fontSize:12,color:isRed?C.red:"#1a1a1a"}}>{card.suit}</span>
       </div>
     </div>
   );
