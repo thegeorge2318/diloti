@@ -105,7 +105,7 @@ function newGameState(prev={player:0,ai:0}) {
     playerPile:[], aiPile:[], playerXeri:0, aiXeri:0,
     playerTotal:prev.player, aiTotal:prev.ai,
     lastCapture:null, turn:"player", selectedCard:null, selectedTable:[],
-    declValue:"", log:"Your turn — select a card from your hand."  // overridden by L.selectCard in render,
+    declValue:"", log:"Your turn — select a card from your hand.",
     gameOver:null, roundOver:null,
   };
 }
