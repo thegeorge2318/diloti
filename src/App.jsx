@@ -107,8 +107,10 @@ function Card({card, selected, tableSelected, onClick, faceDown}) {
         <span style={{fontSize:13,fontWeight:700,color:isRed?C.red:"#1a1a1a"}}>{card.rank}</span>
         <span style={{fontSize:11,color:isRed?C.red:"#1a1a1a"}}>{card.suit}</span>
       </div>
-      {/* centre suit */}
-      <div style={{textAlign:"center",fontSize:22,color:isRed?C.red:"#1a1a1a",lineHeight:1}}>{card.suit}</div>
+      {/* centre */}
+      <div style={{textAlign:"center",fontSize:isFace(card.rank)?28:22,color:isRed?C.red:"#1a1a1a",lineHeight:1}}>
+        {card.rank==="K"?"♔":card.rank==="Q"?"♕":card.rank==="J"?"♖":card.suit}
+      </div>
       {/* bottom-right rotated */}
       <div style={{display:"flex",flexDirection:"column",alignItems:"flex-end",lineHeight:1,transform:"rotate(180deg)"}}>
         <span style={{fontSize:13,fontWeight:700,color:isRed?C.red:"#1a1a1a"}}>{card.rank}</span>
@@ -329,7 +331,7 @@ export default function Diloti() {
   useEffect(()=>{
     if(G.turn==="ai"&&!G.gameOver&&!G.roundOver){
       setAiThinking(true);
-      const t=setTimeout(()=>{ setG(prev=>runAiTurn(prev)); setAiThinking(false); },900);
+      const t=setTimeout(()=>{ setG(prev=>runAiTurn(prev)); setAiThinking(false); },2500);
       return()=>clearTimeout(t);
     }
   },[G.turn,G.gameOver,G.roundOver,runAiTurn]);
