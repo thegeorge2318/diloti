@@ -306,11 +306,11 @@ const RULES = {
     <p style={{fontWeight:700,marginBottom:3}}>Laying</p><p>Place a card on the table if you can't or don't want to capture. You must capture a matching face card if one is on the table.</p>
   </div>),
   Declaring: (<div style={{fontSize:13,lineHeight:1.75,color:"#374151"}}>
-    <p style={{fontWeight:700,marginBottom:3}}>Plain pile</p><p style={{marginBottom:8}}>Play a card + select table cards whose total equals your declared value. You must hold another card of that value to "protect" it.</p>
-    <p style={{fontWeight:700,marginBottom:3}}>Group / family</p><p style={{marginBottom:8}}>Combine cards/piles that each equal the same value (e.g. three 8s, or 3+5 grouped with an 8). Only capturable as a whole.</p>
-    <p style={{fontWeight:700,marginBottom:3}}>Raising</p><p style={{marginBottom:8}}>Add a card to your opponent's declaration to raise its value (max 10), merging it onto your own pile.</p>
-    <p style={{fontWeight:700,marginBottom:3}}>Adding to your own</p><p style={{marginBottom:8}}>You can add to your own declaration if it keeps the same value (forming a group, e.g. adding more 9s).</p>
-    <p style={{fontWeight:700,marginBottom:3}}>Must pick up</p><p>Once you have a declaration on the table, on your next turn you must capture or add to a pile. You cannot lay a card or make a second declaration until you pick up your existing one.</p>
+    <p style={{fontWeight:700,marginBottom:3}}>Plain pile</p><p style={{marginBottom:8}}>Play a card + select table cards whose total equals your declared value. You must hold another card of that value in hand to back it.</p>
+    <p style={{fontWeight:700,marginBottom:3}}>Group / family</p><p style={{marginBottom:8}}>Combine cards that each equal the same value (e.g. three 8s, or 3+5 grouped with an 8). Can only be captured as a whole by that value.</p>
+    <p style={{fontWeight:700,marginBottom:3}}>Raising</p><p style={{marginBottom:8}}>You can raise your <b>opponent's</b> declaration by adding a card to increase its value (max 10). You must hold a card of the new value. You <b>cannot</b> raise your own declaration.</p>
+    <p style={{fontWeight:700,marginBottom:3}}>Adding to your own</p><p style={{marginBottom:8}}>You can add to your own declaration <b>only</b> if the card keeps the same declared value (forming a group, e.g. adding another 8 to a pile of 8s). You cannot change the value.</p>
+    <p style={{fontWeight:700,marginBottom:3}}>Must pick up</p><p>Once you have a declaration on the table you must — on every subsequent turn — capture, add to a pile, raise the opponent's pile, or capture other cards. You cannot lay a card or make a new declaration until yours is picked up.</p>
   </div>),
   Scoring: (<div style={{fontSize:13,lineHeight:1.75,color:"#374151"}}>
     <p style={{marginBottom:8}}>11 points available per round, plus xeri bonuses:</p>
@@ -460,6 +460,18 @@ export default function Diloti() {
       if(sel.length!==1||sel[0].rank!==card.rank){update(s=>{s.log="Face cards capture exactly one matching face card.";}); return;}
     } else {
       const getValue=tc=>tc.isDecl?tc.decl.value:cardVal(tc.rank);
+
+      // Own declaration can only be captured by a card matching its declared value,
+      // not bundled with unrelated cards to make a different sum
+      const ownDecls=sel.filter(tc=>tc.isDecl&&tc.decl?.owner==="player");
+      if(ownDecls.length>0){
+        const dv=ownDecls[0].decl.value;
+        if(dv!==cv){update(s=>{s.log=`Your declared pile (${dv}) can only be captured with a ${dv}, not a ${cv}.`;}); return;}
+        const otherSel=sel.filter(tc=>!ownDecls.includes(tc));
+        const allOtherMatchDv=otherSel.every(tc=>getValue(tc)===cv);
+        if(!allOtherMatchDv){update(s=>{s.log=`You can't bundle your declared pile with unrelated cards. Only cards of the same value (${cv}) can be captured together.`;}); return;}
+      }
+
       const allSame=sel.every(tc=>!tc.isDecl&&cardVal(tc.rank)===cv);
       function canPartition(items,target){
         if(items.length===0)return true;
@@ -531,10 +543,10 @@ export default function Diloti() {
       const ed=selDecls[0];
       const addTotal=cv+selLoose.reduce((a,tc)=>a+cardVal(tc.rank),0);
       const isAddOwn=ed.decl.owner==="player"&&addTotal===ed.decl.value&&dv===ed.decl.value;
-      if(ed.decl.owner==="player"&&!isAddOwn){update(s=>{s.log=`You can only add to your own pile if your card (± loose cards) equals its declared value (${ed.decl.value}).`;}); return;}
+      if(ed.decl.owner==="player"&&!isAddOwn){update(s=>{s.log=`You cannot raise your own declaration. You can only add cards that keep the same value (${ed.decl.value}) to form a group. Only your opponent can raise it to a new value.`;}); return;}
       if(ed.decl.owner==="ai"){
         const raiseTotal=ed.decl.value+cv+selLoose.reduce((a,tc)=>a+cardVal(tc.rank),0);
-        if(raiseTotal!==dv){update(s=>{s.log=`Raise value must be ${ed.decl.value} + your card = ${raiseTotal}.`;}); return;}
+        if(raiseTotal!==dv){update(s=>{s.log=`To raise this declaration, the new value must equal ${ed.decl.value} (existing) + your card${selLoose.length?" + loose cards":""} = ${raiseTotal}. Enter ${raiseTotal} as the declared value.`;}); return;}
         if(dv>10){update(s=>{s.log="Declarations can't exceed 10.";}); return;}
       }
     } else if(selDecls.length>1){
@@ -567,6 +579,7 @@ export default function Diloti() {
 
     setG(prev=>{
       const s2=prev.selectedTable;
+      // Owner is always the player making this declaration (even if raising opponent's)
       const dc=[...s2.flatMap(tc=>tc.cards||[tc]),card];
       const nd={id:"decl_"+Date.now(),rank:"D",suit:"",isDecl:true,decl:{type:"plain",value:dv,owner:"player"},cards:dc};
       const next={...prev,playerHand:prev.playerHand.filter(c=>c.id!==card.id),tableCards:[...prev.tableCards.filter(tc=>!s2.some(s=>s.id===tc.id)),nd],selectedCard:null,selectedTable:[],declValue:"",turn:"ai",log:`You declared a pile of ${dv}.`};
