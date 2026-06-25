@@ -329,6 +329,7 @@ const RULES = {
 export default function Diloti() {
   const [G, setG] = useState(()=>newGameState());
   const [lang, setLang] = useState("en");
+  const [difficulty, setDifficulty] = useState("beginner");
   const L = T[lang];
   const [showRules, setShowRules] = useState(false);
   const [rulesTab, setRulesTab] = useState(0);
@@ -376,9 +377,10 @@ export default function Diloti() {
     return{...state,deck:state.deck.slice(12),playerHand:cards.slice(0,6),aiHand:cards.slice(6,12),turn:"player",selectedCard:null,selectedTable:[],log:"New cards dealt — your turn!"};
   },[scoreAndEndRound]);
 
-  const runAiTurn=useCallback(prev=>{
-    const state={...prev,aiHand:[...prev.aiHand],tableCards:[...prev.tableCards],aiPile:[...prev.aiPile]};
+  // ── Beginner AI (simple greedy) ─────────────────────────────────────────────
+  const runBeginnerAi=(state)=>{
     let best=null;
+    const getVal=tc=>tc.isDecl?tc.decl.value:cardVal(tc.rank);
     for(const card of state.aiHand){
       const cv=cardVal(card.rank);
       if(isFace(card.rank)){
@@ -410,6 +412,150 @@ export default function Diloti() {
     let logMsg="";
     if(!best){
       const toPlay=state.aiHand.find(c=>!isFace(c.rank))||state.aiHand[0];
+      state.tableCards=[...state.tableCards,{...toPlay,decl:null}];
+      state.aiHand=state.aiHand.filter(c=>c.id!==toPlay.id);
+      logMsg=`AI lays the ${toPlay.rank}${toPlay.suit}.`;
+    } else if(best.type==="capture"){
+      doCapture(state,"ai",best.card,best.targets);
+      state.aiHand=state.aiHand.filter(c=>c.id!==best.card.id);
+      logMsg=state.log.includes("Xeri")?state.log:`AI captures with ${best.card.rank}${best.card.suit}.`;
+    } else {
+      const dc=[...best.targets.flatMap(tc=>tc.cards||[tc]),best.card];
+      const nd={id:"decl_"+Date.now(),rank:"D",suit:"",isDecl:true,decl:{type:"plain",value:best.declVal,owner:"ai"},cards:dc};
+      state.tableCards=[...state.tableCards.filter(tc=>!best.targets.some(t=>t.id===tc.id)),nd];
+      state.aiHand=state.aiHand.filter(c=>c.id!==best.card.id);
+      logMsg=`AI declares a pile of ${best.declVal}.`;
+    }
+    return {state, logMsg};
+  };
+
+  const runAiTurn=useCallback(prev=>{
+    const state={...prev,aiHand:[...prev.aiHand],tableCards:[...prev.tableCards],aiPile:[...prev.aiPile]};
+
+    // Delegate to beginner AI if difficulty is set to beginner
+    if(difficulty==="beginner"){
+      const{state:bs,logMsg:bLog}=runBeginnerAi(state);
+      bs.turn="player";
+      if(!bs.log.includes("Xeri")) bs.log=bLog+" Your turn.";
+      else bs.log=bs.log+" Your turn.";
+      if(bs.playerHand.length===0&&bs.aiHand.length===0) return dealNewHands(bs);
+      return bs;
+    }
+
+    // ── helpers ──────────────────────────────────────────────────────────────
+    const getVal=tc=>tc.isDecl?tc.decl.value:cardVal(tc.rank);
+    const isValuable=c=>( (c.rank==="10"&&c.suit==="♦") || (c.rank==="2"&&c.suit==="♣") || c.rank==="A" );
+    const cardScore=c=>{
+      if(c.rank==="10"&&c.suit==="♦") return 8;
+      if(c.rank==="2"&&c.suit==="♣") return 4;
+      if(c.rank==="A") return 3;
+      if(c.suit==="♣") return 1.5; // clubs count for most-clubs point
+      return 1;
+    };
+    const comboScore=combo=>{
+      const flat=deepFlatten(combo);
+      return flat.reduce((a,c)=>a+cardScore(c),0);
+    };
+    const wouldXeri=(targets)=>{
+      const rem=state.tableCards.filter(tc=>!targets.some(t=>t.id===tc.id));
+      return rem.length===0&&(state.playerPile.length+state.aiPile.length)>0;
+    };
+    // Would leaving this card on the table let player score a xeri?
+    const givesPlayerXeri=(playedCard)=>{
+      if(state.tableCards.length===0) return true; // table empty → xeri for player
+      return false;
+    };
+    // Is table currently a single card? (classic xeri trap — don't lay into it)
+    const tableIsSingle=state.tableCards.length===1;
+    // Does player have an active declaration?
+    const playerHasDecl=state.tableCards.some(tc=>tc.isDecl&&tc.decl?.owner==="player");
+
+    // ── enumerate all capture moves ──────────────────────────────────────────
+    let moves=[];
+
+    for(const card of state.aiHand){
+      const cv=cardVal(card.rank);
+      if(isFace(card.rank)){
+        const m=state.tableCards.find(tc=>tc.rank===card.rank&&!tc.isDecl);
+        if(m) moves.push({type:"capture",card,targets:[m],score:cardScore(m)+2});
+      } else {
+        const{numericCombos,matchingDecls}=findCombos(cv,state.tableCards);
+        // Build all valid capture combos (numeric sets + any matching decl)
+        const allCombos=[];
+        if(numericCombos.length>0){
+          numericCombos.forEach(c=>{
+            // Include matching decls too if they exist
+            allCombos.push(matchingDecls.length>0?[...c,...matchingDecls]:c);
+          });
+        }
+        if(matchingDecls.length>0&&numericCombos.length===0) allCombos.push(matchingDecls);
+
+        for(const combo of allCombos){
+          const xeri=wouldXeri(combo);
+          let sc=comboScore(combo)+(xeri?200:0); // xeri is top priority always
+          moves.push({type:"capture",card,targets:combo,score:sc,xeri});
+        }
+      }
+    }
+
+    // ── enumerate declare moves ───────────────────────────────────────────────
+    // Only declare if no existing AI declaration on table
+    const aiHasDecl=state.tableCards.some(tc=>tc.isDecl&&tc.decl?.owner==="ai");
+    if(!aiHasDecl){
+      for(const card of state.aiHand){
+        const cv=cardVal(card.rank);
+        if(isFace(card.rank)||!cv) continue;
+        const loose=state.tableCards.filter(tc=>!tc.isDecl&&!isFace(tc.rank));
+        for(const tc of loose){
+          const sum=cv+getVal(tc);
+          if(sum>=2&&sum<=10&&state.aiHand.some(c=>c.id!==card.id&&cardVal(c.rank)===sum)){
+            // Score the declaration: prefer high-value sums, prefer protecting valuable cards
+            const declScore=sum*0.8+(isValuable(card)||isValuable(tc)?3:0);
+            moves.push({type:"declare",card,targets:[tc],declVal:sum,score:declScore});
+          }
+        }
+      }
+    }
+
+    // ── pick best move ────────────────────────────────────────────────────────
+    // Sort: xeri first, then by score
+    moves.sort((a,b)=>b.score-a.score);
+    let best=moves[0]||null;
+
+    // ── if must pick up own declaration, prioritise capturing it ─────────────
+    if(aiHasDecl){
+      const myDecl=state.tableCards.find(tc=>tc.isDecl&&tc.decl?.owner==="ai");
+      // Only consider moves that include capturing the decl
+      const declMoves=moves.filter(m=>m.type==="capture"&&m.targets.some(t=>t.id===myDecl.id));
+      if(declMoves.length>0) best=declMoves[0];
+      else {
+        // Can't capture own decl this turn — capture something else valuable
+        const otherCaptures=moves.filter(m=>m.type==="capture"&&!m.targets.some(t=>t.id===myDecl.id));
+        best=otherCaptures[0]||null;
+      }
+    }
+
+    // ── if no capture, lay a card carefully ──────────────────────────────────
+    let logMsg="";
+    if(!best){
+      // Don't lay a card that gives the player a free xeri
+      // Prefer laying: low-value numerals, avoid giving away 10♦, 2♣, Aces
+      // Avoid laying onto empty table or single-card table unless no choice
+      const hand=state.aiHand;
+      // Score each card for "safeness" of laying (lower = safer to lay)
+      const layCandidates=hand.map(c=>{
+        let danger=0;
+        if(isValuable(c)) danger+=10; // don't lay valuable cards
+        if(isFace(c.rank)) danger+=3;  // face cards are somewhat risky to lay
+        // If laying this card would complete a pair with something on the table → risky (player captures)
+        const cv=cardVal(c.rank);
+        if(cv&&state.tableCards.some(tc=>getVal(tc)===cv)) danger+=4;
+        // Don't give xeri
+        if(state.tableCards.length===0) danger+=20;
+        return{card:c,danger};
+      }).sort((a,b)=>a.danger-b.danger);
+
+      const toPlay=layCandidates[0]?.card||hand[0];
       state.tableCards=[...state.tableCards,{...toPlay,decl:null}];
       state.aiHand=state.aiHand.filter(c=>c.id!==toPlay.id);
       logMsg=`AI lays the ${toPlay.rank}${toPlay.suit}.`;
@@ -607,7 +753,17 @@ export default function Diloti() {
             {lang==="en"?"🇬🇷 GR":"🇬🇧 EN"}
           </button>
           <Btn onClick={()=>setShowRules(true)}>{L.rules}</Btn>
-          <Btn onClick={startNewGame} primary>{L.newGame}</Btn>
+          <div style={{display:"flex",flexDirection:"column",gap:3,alignItems:"flex-end"}}>
+            <Btn onClick={startNewGame} primary>{L.newGame}</Btn>
+            <div style={{display:"flex",gap:4}}>
+              <button onClick={()=>setDifficulty("beginner")} style={{padding:"2px 8px",borderRadius:6,border:"none",fontSize:10,fontWeight:700,cursor:"pointer",background:difficulty==="beginner"?"#e8c96a":"rgba(255,255,255,0.15)",color:difficulty==="beginner"?"#2a1800":C.text}}>
+                BEGINNER
+              </button>
+              <button onClick={()=>setDifficulty("expert")} style={{padding:"2px 8px",borderRadius:6,border:"none",fontSize:10,fontWeight:700,cursor:"pointer",background:difficulty==="expert"?"#e8c96a":"rgba(255,255,255,0.15)",color:difficulty==="expert"?"#2a1800":C.text}}>
+                EXPERT
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -619,7 +775,7 @@ export default function Diloti() {
       </div>
 
       {/* AI hand */}
-      <Zone label={L.aiHand} info={`${G.aiPile.length} ${L.captured} · ${G.aiXeri} ${L.xeri} · ${G.deck.length} ${L.inStock}`}
+      <Zone label={`${L.aiHand} (${difficulty==="expert"?"Expert":"Beginner"})`} info={`${G.aiPile.length} ${L.captured} · ${G.aiXeri} ${L.xeri} · ${G.deck.length} ${L.inStock}`}
         cards={G.aiHand} faceDown emptyText={L.noCards} accent={C.textMuted} />
 
       {/* Table */}
