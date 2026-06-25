@@ -746,24 +746,25 @@ export default function Diloti() {
     }}>
 
       {/* Header */}
-      <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:14}}>
-        {/* Row 1: title + buttons */}
+      <div style={{display:"flex",flexDirection:"column",gap:6,marginBottom:14}}>
+        {/* Row 1: title left, lang toggle right */}
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
           <span style={{fontSize:22,fontWeight:800,color:C.gold,letterSpacing:"0.04em",textShadow:`0 1px 6px rgba(0,0,0,0.4)`}}>{L.title}</span>
-          <div style={{display:"flex",gap:6,alignItems:"center"}}>
-            <button onClick={()=>setLang(l=>l==="en"?"gr":"en")} style={{padding:"5px 8px",borderRadius:8,border:`1px solid ${C.panelBorder}`,background:"rgba(255,255,255,0.1)",color:C.text,cursor:"pointer",fontSize:11,fontWeight:600,whiteSpace:"nowrap"}}>
-              {lang==="en"?"🇬🇷 GR":"🇬🇧 EN"}
-            </button>
-            <Btn onClick={()=>setShowRules(true)}>{L.rules}</Btn>
-            <Btn onClick={startNewGame} primary>{L.newGame}</Btn>
-          </div>
+          <button onClick={()=>setLang(l=>l==="en"?"gr":"en")} style={{padding:"5px 10px",borderRadius:8,border:`1px solid ${C.panelBorder}`,background:"rgba(255,255,255,0.1)",color:C.text,cursor:"pointer",fontSize:11,fontWeight:600,whiteSpace:"nowrap"}}>
+            {lang==="en"?"🇬🇷 GR":"🇬🇧 EN"}
+          </button>
         </div>
-        {/* Row 2: difficulty toggle, right-aligned */}
+        {/* Row 2: Rules + New Game right-aligned */}
+        <div style={{display:"flex",justifyContent:"flex-end",gap:6,alignItems:"center"}}>
+          <Btn onClick={()=>setShowRules(true)}>{L.rules}</Btn>
+          <Btn onClick={startNewGame} primary>{L.newGame}</Btn>
+        </div>
+        {/* Row 3: difficulty toggle right-aligned */}
         <div style={{display:"flex",justifyContent:"flex-end",gap:4}}>
-          <button onClick={()=>setDifficulty("beginner")} style={{padding:"3px 10px",borderRadius:6,border:`1px solid ${difficulty==="beginner"?C.gold:C.panelBorder}`,fontSize:10,fontWeight:700,cursor:"pointer",background:difficulty==="beginner"?"rgba(201,168,76,0.25)":"rgba(255,255,255,0.08)",color:difficulty==="beginner"?C.gold:C.textMuted,letterSpacing:"0.06em"}}>
+          <button onClick={()=>setDifficulty("beginner")} style={{padding:"3px 10px",borderRadius:6,border:`1px solid ${difficulty==="beginner"?C.gold:C.panelBorder}`,fontSize:10,fontWeight:700,cursor:"pointer",background:difficulty==="beginner"?"rgba(201,168,76,0.25)":"rgba(255,255,255,0.08)",color:difficulty==="beginner"?C.gold:C.textMuted,letterSpacing:"0.06em",whiteSpace:"nowrap"}}>
             {L.beginner}
           </button>
-          <button onClick={()=>setDifficulty("expert")} style={{padding:"3px 10px",borderRadius:6,border:`1px solid ${difficulty==="expert"?C.gold:C.panelBorder}`,fontSize:10,fontWeight:700,cursor:"pointer",background:difficulty==="expert"?"rgba(201,168,76,0.25)":"rgba(255,255,255,0.08)",color:difficulty==="expert"?C.gold:C.textMuted,letterSpacing:"0.06em"}}>
+          <button onClick={()=>setDifficulty("expert")} style={{padding:"3px 10px",borderRadius:6,border:`1px solid ${difficulty==="expert"?C.gold:C.panelBorder}`,fontSize:10,fontWeight:700,cursor:"pointer",background:difficulty==="expert"?"rgba(201,168,76,0.25)":"rgba(255,255,255,0.08)",color:difficulty==="expert"?C.gold:C.textMuted,letterSpacing:"0.06em",whiteSpace:"nowrap"}}>
             {L.expert}
           </button>
         </div>
