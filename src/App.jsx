@@ -27,7 +27,7 @@ const C = {
 const T = {
   en: {
     title: "DILOTI", subtitle: "Diloti",
-    rules: "📖 Rules", newGame: "New Game",
+    rules: "📖 Rules", newGame: "New Game", beginner: "BEGINNER", expert: "EXPERT",
     you: "YOU", ai: "AI", target: "TARGET",
     aiHand: "AI HAND", table: "TABLE", yourHand: "YOUR HAND",
     captured: "captured", xeri: "xeri", inStock: "in stock",
@@ -43,7 +43,7 @@ const T = {
   },
   gr: {
     title: "ΔΗΛΩΤΗ", subtitle: "Δηλωτή",
-    rules: "📖 Κανόνες", newGame: "Νέο Παιχνίδι",
+    rules: "📖 Κανόνες", newGame: "Νέο Παιχνίδι", beginner: "ΑΡΧΑΡΙΟΣ", expert: "ΕΙΔΙΚΟΣ",
     you: "ΕΣΥΣ", ai: "ΑΙ", target: "ΣΤΟΧΟΣ",
     aiHand: "ΧΑΡΤΙΑ ΑΙ", table: "ΤΡΑΠΕΖΙ", yourHand: "ΤΑ ΧΑΡΤΙΑ ΣΟΥ",
     captured: "πιάστηκαν", xeri: "ξερί", inStock: "στη τράπουλα",
@@ -761,10 +761,10 @@ export default function Diloti() {
         {/* Row 2: difficulty toggle, right-aligned */}
         <div style={{display:"flex",justifyContent:"flex-end",gap:4}}>
           <button onClick={()=>setDifficulty("beginner")} style={{padding:"3px 10px",borderRadius:6,border:`1px solid ${difficulty==="beginner"?C.gold:C.panelBorder}`,fontSize:10,fontWeight:700,cursor:"pointer",background:difficulty==="beginner"?"rgba(201,168,76,0.25)":"rgba(255,255,255,0.08)",color:difficulty==="beginner"?C.gold:C.textMuted,letterSpacing:"0.06em"}}>
-            BEGINNER
+            {L.beginner}
           </button>
           <button onClick={()=>setDifficulty("expert")} style={{padding:"3px 10px",borderRadius:6,border:`1px solid ${difficulty==="expert"?C.gold:C.panelBorder}`,fontSize:10,fontWeight:700,cursor:"pointer",background:difficulty==="expert"?"rgba(201,168,76,0.25)":"rgba(255,255,255,0.08)",color:difficulty==="expert"?C.gold:C.textMuted,letterSpacing:"0.06em"}}>
-            EXPERT
+            {L.expert}
           </button>
         </div>
       </div>
@@ -777,7 +777,7 @@ export default function Diloti() {
       </div>
 
       {/* AI hand */}
-      <Zone label={`${L.aiHand} (${difficulty==="expert"?"Expert":"Beginner"})`} info={`${G.aiPile.length} ${L.captured} · ${G.aiXeri} ${L.xeri} · ${G.deck.length} ${L.inStock}`}
+      <Zone label={`${L.aiHand} (${difficulty==="expert"?L.expert:L.beginner})`} info={`${G.aiPile.length} ${L.captured} · ${G.aiXeri} ${L.xeri} · ${G.deck.length} ${L.inStock}`}
         cards={G.aiHand} faceDown emptyText={L.noCards} accent={C.textMuted} />
 
       {/* Table */}
